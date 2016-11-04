@@ -46,7 +46,7 @@ func (c *TerraformCommand) Synopsis() string {
 
 func (c *TerraformCommand) Help() string {
 	helpText := `
-Usage: hatlas terraform [options] <environment>
+Usage: hatlas terra [options] <environment>
 
   Downloads terraform state file for <environment>.
 

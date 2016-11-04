@@ -22,6 +22,11 @@ func main() {
 	meta := *metaPtr
 
 	c.Commands = map[string]cli.CommandFactory{
+		"terra": func() (cli.Command, error) {
+			return &command.TerraformCommand{
+				Meta: meta,
+			}, nil
+		},
 		"terraform": func() (cli.Command, error) {
 			return &command.TerraformCommand{
 				Meta: meta,

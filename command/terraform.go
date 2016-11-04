@@ -70,6 +70,10 @@ func (c *TerraformCommand) listStates(client *terraform.AtlasClient) error {
 }
 
 func (c *TerraformCommand) getState(client *terraform.AtlasClient, env string) error {
-	//_, err := client.GetState()
+	stateRaw, err := client.GetState(env)
+	if err != nil {
+		return err
+	}
+	c.Ui.Info(string(stateRaw))
 	return nil
 }

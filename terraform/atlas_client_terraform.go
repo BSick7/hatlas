@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type StateListResponse struct {
+type ListTerraformsResponse struct {
 	States []struct {
 		UpdatedAt   time.Time `json:"updated_at"`
 		Environment struct {
@@ -19,7 +19,7 @@ type StateListResponse struct {
 	} `json:"meta"`
 }
 
-func (res *StateListResponse) Names() []string {
+func (res *ListTerraformsResponse) Names() []string {
 	names := []string{}
 	for _, state := range res.States {
 		names = append(names, fmt.Sprintf("%s/%s", state.Environment.Username, state.Environment.Name))
@@ -27,7 +27,7 @@ func (res *StateListResponse) Names() []string {
 	return names
 }
 
-func (c *AtlasClient) ListStates(username string) (*StateListResponse, error) {
+func (c *AtlasClient) ListTerraforms(username string) (*ListTerraformsResponse, error) {
 	path := "/api/v1/terraform/state"
 	if username != "" {
 		path = path + "/" + username
@@ -38,9 +38,18 @@ func (c *AtlasClient) ListStates(username string) (*StateListResponse, error) {
 		return nil, err
 	}
 
-	var res StateListResponse
+	var res ListTerraformsResponse
 	if err := json.Unmarshal(payload.Data, &res); err != nil {
 		return nil, err
 	}
 	return &res, nil
+}
+
+func (c *AtlasClient) GetTerraformState(env string) ([]byte, error) {
+	path := fmt.Sprintf("/api/v1/terraform/state/%s", env)
+	payload, err := c.get(path)
+	if err != nil {
+		return nil, err
+	}
+	return payload.Data, nil
 }

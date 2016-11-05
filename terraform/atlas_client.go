@@ -31,8 +31,8 @@ func NewAtlasClient(config *AtlasConfig) *AtlasClient {
 	}
 }
 
-func (c *AtlasClient) get(path string) (*Payload, error) {
-	u, err := c.config.Url(path)
+func (c *AtlasClient) get(path string, query map[string]string) (*Payload, error) {
+	u, err := c.config.Url(path, query)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create Atlas URL: %s", err)
 	}

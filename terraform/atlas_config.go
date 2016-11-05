@@ -23,11 +23,16 @@ func DefaultAtlasConfig() *AtlasConfig {
 	}
 }
 
-func (ac *AtlasConfig) Url(path string) (*url.URL, error) {
+func (ac *AtlasConfig) Url(path string, query map[string]string) (*url.URL, error) {
 	u, err := url.Parse(ac.Address)
 	if err != nil {
 		return nil, err
 	}
 	u.Path = path
+	params := url.Values{}
+	for k, v := range query {
+		params.Add(k, v)
+	}
+	u.RawQuery = params.Encode()
 	return u, nil
 }

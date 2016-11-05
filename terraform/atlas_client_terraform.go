@@ -29,11 +29,12 @@ func (res *ListTerraformsResponse) Names() []string {
 
 func (c *AtlasClient) ListTerraforms(username string) (*ListTerraformsResponse, error) {
 	path := "/api/v1/terraform/state"
+	query := map[string]string{}
 	if username != "" {
-		path = path + "/" + username
+		query["username"] = username
 	}
 
-	payload, err := c.get(path)
+	payload, err := c.get(path, query)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +48,7 @@ func (c *AtlasClient) ListTerraforms(username string) (*ListTerraformsResponse, 
 
 func (c *AtlasClient) GetTerraformState(env string) ([]byte, error) {
 	path := fmt.Sprintf("/api/v1/terraform/state/%s", env)
-	payload, err := c.get(path)
+	payload, err := c.get(path, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func (c *AtlasClient) GetTerraformState(env string) ([]byte, error) {
 
 func (c *AtlasClient) GetTerraformConfig(env string) ([]byte, error) {
 	path := fmt.Sprintf("/api/v1/terraform/configurations/%s/versions/latest", env)
-	payload, err := c.get(path)
+	payload, err := c.get(path, nil)
 	if err != nil {
 		return nil, err
 	}

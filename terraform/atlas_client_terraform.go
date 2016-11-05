@@ -53,3 +53,12 @@ func (c *AtlasClient) GetTerraformState(env string) ([]byte, error) {
 	}
 	return payload.Data, nil
 }
+
+func (c *AtlasClient) GetTerraformConfig(env string) ([]byte, error) {
+	path := fmt.Sprintf("/api/v1/terraform/configurations/%s/versions/latest", env)
+	payload, err := c.get(path)
+	if err != nil {
+		return nil, err
+	}
+	return payload.Data, nil
+}

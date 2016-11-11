@@ -10,7 +10,7 @@ import (
 var Version string
 
 func main() {
-	c := cli.NewCLI("deploy", Version)
+	c := cli.NewCLI("hatlas", Version)
 	c.Args = os.Args[1:]
 	metaPtr := &command.Meta{
 		Ui: &cli.BasicUi{

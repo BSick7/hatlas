@@ -1,7 +1,9 @@
 package command
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/BSick7/hatlas/structs"
 	"github.com/BSick7/hatlas/terraform"
 	"github.com/mitchellh/cli"
 	"strings"
@@ -62,6 +64,12 @@ func (c *TerraConfigCommand) getConfig(client *terraform.AtlasClient, env string
 	if err != nil {
 		return err
 	}
-	c.Ui.Info(string(stateRaw))
+
+	trc := &structs.TerraformRawConfig{}
+	if err := json.Unmarshal(stateRaw, trc); err != nil {
+		return err
+	}
+
+	c.Ui.Info(trc.Dump())
 	return nil
 }

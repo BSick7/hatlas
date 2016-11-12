@@ -19,9 +19,10 @@ func TerraCommandFactory(meta Meta) cli.CommandFactory {
 
 func (c *TerraCommand) Subcommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
-		"list":   TerraListFactory(c.Meta),
-		"state":  TerraStateFactory(c.Meta),
-		"config": TerraConfigFactory(c.Meta),
+		"list":    TerraListFactory(c.Meta),
+		"state":   TerraStateFactory(c.Meta),
+		"outputs": TerraOutputsFactory(c.Meta),
+		"config":  TerraConfigFactory(c.Meta),
 	}
 }
 
@@ -47,6 +48,7 @@ Available subcommands:
 
   list      List environments
   state     Introspect state file
+  outputs   Introspect outputs
   config    Introspect configuration
 `
 	return strings.TrimSpace(helpText)

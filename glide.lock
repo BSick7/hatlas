@@ -1,0 +1,24 @@
+hash: 19f1e379e6984629a92b545b3febfb3dc34e00a643e76f626ebd7cf4e2d40bf7
+updated: 2016-11-12T08:53:13.4923672-05:00
+imports:
+- name: github.com/armon/go-radix
+  version: 4239b77079c7b5d1243b7b4736304ce8ddb6f0f2
+- name: github.com/bgentry/speakeasy
+  version: a1ccbf2c40dfc8ce514b5c5c6e6d1429ea6880da
+- name: github.com/hashicorp/go-cleanhttp
+  version: 875fb671b3ddc66f8e2f0acc33829c8cb989a38d
+- name: github.com/hashicorp/go-retryablehttp
+  version: 6e85be8fee1dcaa02c0eaaac2df5a8fbecf94145
+- name: github.com/hashicorp/go-rootcerts
+  version: 6bb64b370b90e7ef1fa532be9e591a81c3493e00
+- name: github.com/mattn/go-isatty
+  version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
+- name: github.com/mitchellh/cli
+  version: fcf521421aa29bde1d93b6920dfce826d7932208
+- name: github.com/mitchellh/go-homedir
+  version: 756f7b183b7ab78acdbbee5c7f392838ed459dda
+- name: golang.org/x/sys
+  version: 20457ee8ea8546920d3f4e19e405da45250dc5a5
+  subpackages:
+  - unix
+testImports: []

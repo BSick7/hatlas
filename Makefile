@@ -11,10 +11,10 @@ vet:
 	glide nv | xargs go vet
 
 build:
-	go build
+	go build -ldflags "-X main.Version=`cat VERSION`"
 
 install:
-	go install
+	go install -ldflags "-X main.Version=`cat VERSION`"
 
 test:
 	set -o pipefail;glide nv \

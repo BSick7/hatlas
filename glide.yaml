@@ -1,2 +1,6 @@
 package: github.com/BSick7/hatlas
-import: []
+import:
+- package: github.com/hashicorp/go-cleanhttp
+- package: github.com/hashicorp/go-retryablehttp
+- package: github.com/hashicorp/go-rootcerts
+- package: github.com/mitchellh/cli

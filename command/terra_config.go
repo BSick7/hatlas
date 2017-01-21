@@ -34,12 +34,17 @@ func (c *TerraConfigCommand) Run(args []string) int {
 		return cli.RunResultHelp
 	}
 	env := fargs[0]
+	key := ""
+	if len(fargs) > 1 {
+		key = fargs[1]
+	}
 
 	client := terraform.NewAtlasClient(nil)
-	if err := c.getConfig(client, env); err != nil {
+	if err := c.getConfig(client, env, key); err != nil {
 		c.Ui.Error(fmt.Sprintf("error getting config [%s]: %s", env, err))
 		return 1
 	}
+
 	return 0
 }
 
@@ -59,7 +64,7 @@ Usage: hatlas terra config <environment>
 	return strings.TrimSpace(helpText)
 }
 
-func (c *TerraConfigCommand) getConfig(client *terraform.AtlasClient, env string) error {
+func (c *TerraConfigCommand) getConfig(client *terraform.AtlasClient, env string, key string) error {
 	stateRaw, err := client.GetTerraformConfig(env)
 	if err != nil {
 		return err
@@ -70,6 +75,10 @@ func (c *TerraConfigCommand) getConfig(client *terraform.AtlasClient, env string
 		return err
 	}
 
-	c.Ui.Info(trc.Dump())
+	if key == "" {
+		c.Ui.Info(trc.Dump())
+	} else {
+		c.Ui.Info(trc.DumpKey(key))
+	}
 	return nil
 }

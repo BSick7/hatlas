@@ -29,3 +29,7 @@ func (c *TerraformRawConfig) Dump() string {
 	}
 	return buf.String()
 }
+
+func (c *TerraformRawConfig) DumpKey(key string) string {
+	return fmt.Sprintf("%s = %s\n", key, c.Version.Variables[key])
+}

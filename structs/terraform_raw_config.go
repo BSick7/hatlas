@@ -24,12 +24,20 @@ type TerraformRawConfigTfVar struct {
 
 func (c *TerraformRawConfig) Dump() string {
 	buf := bytes.NewBufferString("")
-	for k, v := range c.Version.Variables {
-		buf.WriteString(fmt.Sprintf("%s = %s\n", k, v))
+	for _, tfvar := range c.Version.TfVars {
+		buf.WriteString(tfvar.Dump())
 	}
 	return buf.String()
 }
 
 func (c *TerraformRawConfig) DumpKey(key string) string {
 	return fmt.Sprintf("%s = %s\n", key, c.Version.Variables[key])
+}
+
+func (v *TerraformRawConfigTfVar) Dump() string {
+	if v.Hcl {
+		return fmt.Sprintf("%s = %s\n", v.Key, v.Value)
+	} else {
+		return fmt.Sprintf("%s = %q\n", v.Key, v.Value)
+	}
 }

@@ -7,13 +7,16 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
-	"github.com/hashicorp/go-cleanhttp"
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/hashicorp/go-rootcerts"
 	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/hashicorp/go-cleanhttp"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/hashicorp/go-rootcerts"
 )
 
 type AtlasClient struct {
@@ -151,6 +154,10 @@ func (c *AtlasClient) http() (*retryablehttp.Client, error) {
 	t := cleanhttp.DefaultTransport()
 	t.TLSClientConfig = tlsConfig
 	rc.HTTPClient.Transport = t
+
+	if os.Getenv("HTTP_DEBUG") == "" {
+		rc.Logger = log.New(ioutil.Discard, "", 0)
+	}
 
 	c.httpClient = rc
 	return rc, nil

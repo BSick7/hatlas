@@ -2,9 +2,10 @@ package command
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/BSick7/hatlas/terraform"
 	"github.com/mitchellh/cli"
-	"strings"
 )
 
 type TerraListCommand struct {
@@ -58,10 +59,27 @@ Terra List Options:
 }
 
 func (c *TerraListCommand) list(client *terraform.AtlasClient, username string) error {
-	states, err := client.ListTerraforms(username)
-	if err != nil {
-		return err
+	names := []string{}
+	page := 1
+	total := -1
+
+	for {
+		states, err := client.ListTerraforms(username, page)
+		if err != nil {
+			return err
+		}
+		if total == -1 {
+			total = states.Meta.Total
+		}
+		if len(states.States) == 0 {
+			break
+		}
+		names = append(names, states.Names()...)
+		if len(names) >= total {
+			break
+		}
+		page++
 	}
-	c.Ui.Info(strings.Join(states.Names(), "\n"))
+	c.Ui.Info(strings.Join(names, "\n"))
 	return nil
 }

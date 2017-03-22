@@ -27,11 +27,14 @@ func (res *ListTerraformsResponse) Names() []string {
 	return names
 }
 
-func (c *AtlasClient) ListTerraforms(username string) (*ListTerraformsResponse, error) {
+func (c *AtlasClient) ListTerraforms(username string, page int) (*ListTerraformsResponse, error) {
 	path := "/api/v1/terraform/state"
 	query := map[string]string{}
 	if username != "" {
 		query["username"] = username
+	}
+	if page > 1 {
+		query["page"] = fmt.Sprintf("%d", page)
 	}
 
 	payload, err := c.get(path, query)
@@ -40,8 +43,10 @@ func (c *AtlasClient) ListTerraforms(username string) (*ListTerraformsResponse, 
 	}
 
 	var res ListTerraformsResponse
-	if err := json.Unmarshal(payload.Data, &res); err != nil {
-		return nil, err
+	if payload != nil {
+		if err := json.Unmarshal(payload.Data, &res); err != nil {
+			return nil, err
+		}
 	}
 	return &res, nil
 }

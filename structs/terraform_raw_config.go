@@ -10,16 +10,26 @@ type TerraformRawConfig struct {
 }
 
 type TerraformRawConfigVersion struct {
-	Version   int                       `json:"version"`
-	Metadata  map[string]interface{}    `json:"metadata"`
-	TfVars    []TerraformRawConfigTfVar `json:"tf_vars"`
-	Variables map[string]string         `json:"variables"`
+	Version   int                      `json:"version"`
+	Metadata  map[string]interface{}   `json:"metadata"`
+	TfVars    TerraformRawConfigTfVars `json:"tf_vars"`
+	Variables map[string]string        `json:"variables"`
 }
 
 type TerraformRawConfigTfVar struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 	Hcl   bool   `json:"hcl"`
+}
+
+type TerraformRawConfigTfVars []TerraformRawConfigTfVar
+
+func (vars TerraformRawConfigTfVars) CreateMap() map[string]interface{} {
+	data := map[string]interface{}{}
+	for _, v := range vars {
+		data[v.Key] = data[v.Value]
+	}
+	return data
 }
 
 func (c *TerraformRawConfig) Dump() string {

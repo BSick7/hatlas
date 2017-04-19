@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/BSick7/hatlas/structs"
 )
 
 type ListTerraformsResponse struct {
@@ -67,4 +69,27 @@ func (c *AtlasClient) GetTerraformConfig(env string) ([]byte, error) {
 		return nil, err
 	}
 	return payload.Data, nil
+}
+
+type UpdateVariablesRequest struct {
+	Variables map[string]string `json:"variables"`
+}
+
+func (req *UpdateVariablesRequest) ToPayload() *Payload {
+	raw, _ := json.Marshal(req)
+	payload := NewPayloadFromString(string(raw))
+	payload.ContentType = "application/json"
+	return payload
+}
+
+func (c *AtlasClient) UpdateVariables(env string, config *structs.TerraformRawConfig) ([]byte, error) {
+	path := fmt.Sprintf("/api/v1/environments/%s/variables", env)
+	req := &UpdateVariablesRequest{
+		Variables: config.GetVarsMap(),
+	}
+
+	if err := c.put(path, nil, req.ToPayload()); err != nil {
+		return nil, err
+	}
+	return []byte(fmt.Sprintf("pushed %d variables to %s", len(req.Variables), env)), nil
 }

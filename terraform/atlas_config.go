@@ -17,8 +17,13 @@ type AtlasConfig struct {
 }
 
 func DefaultAtlasConfig() *AtlasConfig {
+	server := os.Getenv("ATLAS_ADDR")
+	if server == "" {
+		server = defaultAtlasServer
+	}
+
 	return &AtlasConfig{
-		Address:     defaultAtlasServer,
+		Address:     server,
 		AccessToken: os.Getenv("ATLAS_TOKEN"),
 	}
 }

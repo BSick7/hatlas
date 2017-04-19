@@ -2,6 +2,7 @@ package structs
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -10,10 +11,10 @@ type TerraformRawConfig struct {
 }
 
 type TerraformRawConfigVersion struct {
-	Version   int                       `json:"version"`
-	Metadata  map[string]interface{}    `json:"metadata"`
-	TfVars    []TerraformRawConfigTfVar `json:"tf_vars"`
-	Variables map[string]string         `json:"variables"`
+	Version   int                      `json:"version"`
+	Metadata  map[string]interface{}   `json:"metadata"`
+	TfVars    TerraformRawConfigTfVars `json:"tf_vars"`
+	Variables map[string]string        `json:"variables"`
 }
 
 type TerraformRawConfigTfVar struct {
@@ -22,12 +23,33 @@ type TerraformRawConfigTfVar struct {
 	Hcl   bool   `json:"hcl"`
 }
 
+type TerraformRawConfigTfVars []TerraformRawConfigTfVar
+
+func (c *TerraformRawConfig) GetVarsMap() map[string]string {
+	return c.Version.Variables
+}
+
+func NewTerraformRawConfigFromJson(raw []byte) (*TerraformRawConfig, error) {
+	trc := &TerraformRawConfig{}
+	err := json.Unmarshal(raw, trc)
+	return trc, err
+}
+
 func (c *TerraformRawConfig) Dump() string {
 	buf := bytes.NewBufferString("")
 	for _, tfvar := range c.Version.TfVars {
 		buf.WriteString(tfvar.Dump())
 	}
 	return buf.String()
+}
+
+func (c *TerraformRawConfig) DumpRaw() string {
+	raw, _ := json.Marshal(c)
+	out := bytes.NewBufferString("")
+	if err := json.Indent(out, raw, "", "  "); err != nil {
+		return string(raw)
+	}
+	return out.String()
 }
 
 func (c *TerraformRawConfig) DumpKey(key string) string {

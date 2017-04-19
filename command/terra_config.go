@@ -3,10 +3,11 @@ package command
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/BSick7/hatlas/structs"
 	"github.com/BSick7/hatlas/terraform"
 	"github.com/mitchellh/cli"
-	"strings"
 )
 
 type TerraConfigCommand struct {
@@ -30,7 +31,7 @@ func (c *TerraConfigCommand) Run(args []string) int {
 
 	fargs := flags.Args()
 	if len(fargs) < 1 {
-		c.Ui.Error("missing terraform environment")
+		c.Ui.Error("terraform environment not specified")
 		return cli.RunResultHelp
 	}
 	env := fargs[0]
@@ -54,17 +55,17 @@ func (c *TerraConfigCommand) Synopsis() string {
 
 func (c *TerraConfigCommand) Help() string {
 	helpText := `
-Usage: hatlas terra config <environment>
+Usage: hatlas terra config <environment> [-raw|<key>]
 
   Downloads terraform config for <environment>.
 
-  The available options allow the emitting of selected
-  values within the state file based on terraform syntax.
+  Specifying -raw will dump the raw json output.
+  Specifying <key> will dump only the variable requested.
 `
 	return strings.TrimSpace(helpText)
 }
 
-func (c *TerraConfigCommand) getConfig(client *terraform.AtlasClient, env string, key string) error {
+func (c *TerraConfigCommand) getConfig(client *terraform.AtlasClient, env string, keyOrRaw string) error {
 	stateRaw, err := client.GetTerraformConfig(env)
 	if err != nil {
 		return err
@@ -75,10 +76,12 @@ func (c *TerraConfigCommand) getConfig(client *terraform.AtlasClient, env string
 		return err
 	}
 
-	if key == "" {
+	if keyOrRaw == "" {
 		c.Ui.Info(trc.Dump())
+	} else if keyOrRaw == "-raw" {
+		c.Ui.Info(trc.DumpRaw())
 	} else {
-		c.Ui.Info(trc.DumpKey(key))
+		c.Ui.Info(trc.DumpKey(keyOrRaw))
 	}
 	return nil
 }

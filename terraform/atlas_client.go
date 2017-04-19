@@ -2,10 +2,8 @@ package terraform
 
 import (
 	"bytes"
-	"crypto/md5"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -37,11 +35,11 @@ func NewAtlasClient(config *AtlasConfig) *AtlasClient {
 func (c *AtlasClient) get(path string, query map[string]string) (*Payload, error) {
 	u, err := c.config.Url(path, query)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create Atlas URL: %s", err)
+		return nil, fmt.Errorf("failed to create Atlas URL: %s", err)
 	}
 	req, err := retryablehttp.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to make HTTP request: %v", err)
+		return nil, fmt.Errorf("failed to make HTTP request: %v", err)
 	}
 
 	req.Header.Set(atlasTokenHeader, c.config.AccessToken)
@@ -77,36 +75,56 @@ func (c *AtlasClient) get(path string, query map[string]string) (*Payload, error
 			resp.StatusCode, c.readBody(resp.Body))
 	}
 
-	// Read in the body
-	buf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(buf, resp.Body); err != nil {
-		return nil, fmt.Errorf("Failed to read remote state: %v", err)
-	}
-
-	// Create the payload
-	payload := &Payload{
-		Data: buf.Bytes(),
-	}
-
-	if len(payload.Data) == 0 {
-		return nil, nil
-	}
-
-	// Check for the MD5
-	if raw := resp.Header.Get("Content-MD5"); raw != "" {
-		md5, err := base64.StdEncoding.DecodeString(raw)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to decode Content-MD5 '%s': %v", raw, err)
-		}
-
-		payload.MD5 = md5
-	} else {
-		// Generate the MD5
-		hash := md5.Sum(payload.Data)
-		payload.MD5 = hash[:]
+	// Read response
+	payload, err := NewPayloadFromResponse(resp)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read remote state: %v", err)
 	}
 
 	return payload, nil
+}
+
+func (c *AtlasClient) put(path string, query map[string]string, payload *Payload) error {
+	u, err := c.config.Url(path, query)
+	if err != nil {
+		return fmt.Errorf("failed to create Atlas URL: %s", err)
+	}
+
+	req, err := retryablehttp.NewRequest("PUT", u.String(), bytes.NewReader(payload.Data))
+	if err != nil {
+		return fmt.Errorf("failed to make HTTP request: %v", err)
+	}
+
+	// Prepare the request
+	req.Header.Set(atlasTokenHeader, c.config.AccessToken)
+	payload.ConfigureRequest(req)
+
+	// Make the request
+	client, err := c.http()
+	if err != nil {
+		return err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Failed to upload state: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if os.Getenv("HTTP_DEBUG") != "" && payload != nil {
+		log.Println(string(payload.Data))
+	}
+
+	// Handle the error codes
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return nil
+	case http.StatusConflict:
+		return fmt.Errorf("conflict: %s", c.readBody(resp.Body))
+	default:
+		return fmt.Errorf(
+			"HTTP error: %d\n\nBody: %s",
+			resp.StatusCode, c.readBody(resp.Body))
+	}
 }
 
 func (c *AtlasClient) readBody(b io.Reader) string {

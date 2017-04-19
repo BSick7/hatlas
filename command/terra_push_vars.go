@@ -48,11 +48,12 @@ func (c *TerraPushVarsCommand) Run(args []string) int {
 	}
 
 	client := terraform.NewAtlasClient(nil)
-	if err := client.UpdateVariables(env, vars); err != nil {
+	response, err := client.UpdateVariables(env, vars)
+	if err != nil {
 		c.Ui.Error(fmt.Sprintf("error pushing vars [%s]: %s", env, err))
 		return 1
 	}
-
+	c.Ui.Info(string(response))
 	return 0
 }
 

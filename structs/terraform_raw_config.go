@@ -34,7 +34,7 @@ func (vars TerraformRawConfigTfVars) CreateMap() map[string]interface{} {
 }
 
 func NewTerraformRawConfigFromJson(raw []byte) (*TerraformRawConfig, error) {
-	var trc *TerraformRawConfig
+	trc := &TerraformRawConfig{}
 	err := json.Unmarshal(raw, trc)
 	return trc, err
 }

@@ -16,9 +16,10 @@ type Payload struct {
 
 func NewPayloadFromString(str string) *Payload {
 	data := bytes.NewBufferString(str).Bytes()
+	hash := md5.Sum(data)
 	return &Payload{
 		Data: data,
-		MD5:  md5.Sum(data)[:],
+		MD5:  hash[:],
 	}
 }
 
@@ -55,7 +56,8 @@ func decodeMD5(res *http.Response, data []byte) ([]byte, error) {
 	}
 
 	// Generate the MD5
-	return md5.Sum(data)[:], nil
+	hash := md5.Sum(data)
+	return hash[:], nil
 }
 
 func (p *Payload) GetReader() io.ReadSeeker {

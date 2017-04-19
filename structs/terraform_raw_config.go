@@ -2,6 +2,7 @@ package structs
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -38,6 +39,15 @@ func (c *TerraformRawConfig) Dump() string {
 		buf.WriteString(tfvar.Dump())
 	}
 	return buf.String()
+}
+
+func (c *TerraformRawConfig) DumpRaw() string {
+	raw, _ := json.Marshal(c)
+	out := bytes.NewBufferString("")
+	if err := json.Indent(out, raw, "", "  "); err != nil {
+		return string(raw)
+	}
+	return out.String()
 }
 
 func (c *TerraformRawConfig) DumpKey(key string) string {

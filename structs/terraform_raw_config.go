@@ -33,6 +33,12 @@ func (vars TerraformRawConfigTfVars) CreateMap() map[string]interface{} {
 	return data
 }
 
+func NewTerraformRawConfigFromJson(raw []byte) (*TerraformRawConfig, error) {
+	var trc *TerraformRawConfig
+	err := json.Unmarshal(raw, trc)
+	return trc, err
+}
+
 func (c *TerraformRawConfig) Dump() string {
 	buf := bytes.NewBufferString("")
 	for _, tfvar := range c.Version.TfVars {

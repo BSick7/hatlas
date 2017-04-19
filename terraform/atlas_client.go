@@ -33,19 +33,11 @@ func NewAtlasClient(config *AtlasConfig) *AtlasClient {
 }
 
 func (c *AtlasClient) get(path string, query map[string]string) (*Payload, error) {
-	return c.do("GET", path, query, nil)
-}
-
-func (c *AtlasClient) put(path string, query map[string]string, payload *Payload) (*Payload, error) {
-	return c.do("PUT", path, query, payload)
-}
-
-func (c *AtlasClient) do(verb string, path string, query map[string]string, data *Payload) (*Payload, error) {
 	u, err := c.config.Url(path, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Atlas URL: %s", err)
 	}
-	req, err := retryablehttp.NewRequest(verb, u.String(), c.createBody(data))
+	req, err := retryablehttp.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make HTTP request: %v", err)
 	}
@@ -62,10 +54,6 @@ func (c *AtlasClient) do(verb string, path string, query map[string]string, data
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	if os.Getenv("HTTP_DEBUG") != "" && data != nil {
-		log.Println(string(data.Data))
-	}
 
 	// Handle the common status codes
 	switch resp.StatusCode {
@@ -96,11 +84,47 @@ func (c *AtlasClient) do(verb string, path string, query map[string]string, data
 	return payload, nil
 }
 
-func (c *AtlasClient) createBody(payload *Payload) io.ReadSeeker {
-	if payload == nil {
-		return nil
+func (c *AtlasClient) put(path string, query map[string]string, payload *Payload) error {
+	u, err := c.config.Url(path, query)
+	if err != nil {
+		return fmt.Errorf("failed to create Atlas URL: %s", err)
 	}
-	return payload.GetReader()
+
+	req, err := retryablehttp.NewRequest("PUT", u.String(), bytes.NewReader(payload.Data))
+	if err != nil {
+		return fmt.Errorf("failed to make HTTP request: %v", err)
+	}
+
+	// Prepare the request
+	req.Header.Set(atlasTokenHeader, c.config.AccessToken)
+	payload.ConfigureRequest(req)
+
+	// Make the request
+	client, err := c.http()
+	if err != nil {
+		return err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Failed to upload state: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if os.Getenv("HTTP_DEBUG") != "" && payload != nil {
+		log.Println(string(payload.Data))
+	}
+
+	// Handle the error codes
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return nil
+	case http.StatusConflict:
+		return fmt.Errorf("conflict: %s", c.readBody(resp.Body))
+	default:
+		return fmt.Errorf(
+			"HTTP error: %d\n\nBody: %s",
+			resp.StatusCode, c.readBody(resp.Body))
+	}
 }
 
 func (c *AtlasClient) readBody(b io.Reader) string {

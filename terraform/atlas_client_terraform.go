@@ -72,12 +72,14 @@ func (c *AtlasClient) GetTerraformConfig(env string) ([]byte, error) {
 }
 
 type UpdateVariablesRequest struct {
-	Variables map[string]interface{} `json:"variables"`
+	Variables map[string]string `json:"variables"`
 }
 
 func (req *UpdateVariablesRequest) ToPayload() *Payload {
 	raw, _ := json.Marshal(req)
-	return NewPayloadFromString(string(raw))
+	payload := NewPayloadFromString(string(raw))
+	payload.ContentType = "application/json"
+	return payload
 }
 
 func (c *AtlasClient) UpdateVariables(env string, config *structs.TerraformRawConfig) ([]byte, error) {
@@ -85,9 +87,9 @@ func (c *AtlasClient) UpdateVariables(env string, config *structs.TerraformRawCo
 	req := &UpdateVariablesRequest{
 		Variables: config.GetVarsMap(),
 	}
-	payload, err := c.put(path, nil, req.ToPayload())
-	if payload != nil {
-		return payload.Data, err
+
+	if err := c.put(path, nil, req.ToPayload()); err != nil {
+		return nil, err
 	}
-	return []byte(fmt.Sprintf("pushed %d variables to %s", len(req.Variables), env)), err
+	return []byte(fmt.Sprintf("pushed %d variables to %s", len(req.Variables), env)), nil
 }

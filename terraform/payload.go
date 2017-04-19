@@ -7,11 +7,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 type Payload struct {
-	MD5  []byte
-	Data []byte
+	MD5         []byte
+	Data        []byte
+	ContentType string
 }
 
 func NewPayloadFromString(str string) *Payload {
@@ -43,6 +46,15 @@ func NewPayloadFromResponse(res *http.Response) (*Payload, error) {
 		MD5:  md5,
 		Data: data,
 	}, nil
+}
+
+func (p *Payload) ConfigureRequest(req *retryablehttp.Request) {
+	if p.ContentType != "" {
+		req.Header.Set("Content-Type", p.ContentType)
+	}
+	b64 := base64.StdEncoding.EncodeToString(p.MD5)
+	req.Header.Set("Content-MD5", b64)
+	req.ContentLength = int64(len(p.Data))
 }
 
 func decodeMD5(res *http.Response, data []byte) ([]byte, error) {

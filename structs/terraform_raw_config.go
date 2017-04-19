@@ -25,12 +25,8 @@ type TerraformRawConfigTfVar struct {
 
 type TerraformRawConfigTfVars []TerraformRawConfigTfVar
 
-func (c *TerraformRawConfig) GetVarsMap() map[string]interface{} {
-	data := map[string]interface{}{}
-	for _, v := range c.Version.TfVars {
-		data[v.Key] = v.Value
-	}
-	return data
+func (c *TerraformRawConfig) GetVarsMap() map[string]string {
+	return c.Version.Variables
 }
 
 func NewTerraformRawConfigFromJson(raw []byte) (*TerraformRawConfig, error) {

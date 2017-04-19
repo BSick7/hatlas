@@ -2,10 +2,8 @@ package terraform
 
 import (
 	"bytes"
-	"crypto/md5"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -85,33 +83,10 @@ func (c *AtlasClient) do(verb string, path string, query map[string]string, data
 			resp.StatusCode, c.readBody(resp.Body))
 	}
 
-	// Read in the body
-	buf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(buf, resp.Body); err != nil {
-		return nil, fmt.Errorf("Failed to read remote state: %v", err)
-	}
-
-	// Create the payload
-	payload := &Payload{
-		Data: buf.Bytes(),
-	}
-
-	if len(payload.Data) == 0 {
-		return nil, nil
-	}
-
-	// Check for the MD5
-	if raw := resp.Header.Get("Content-MD5"); raw != "" {
-		md5, err := base64.StdEncoding.DecodeString(raw)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to decode Content-MD5 '%s': %v", raw, err)
-		}
-
-		payload.MD5 = md5
-	} else {
-		// Generate the MD5
-		hash := md5.Sum(payload.Data)
-		payload.MD5 = hash[:]
+	// Read response
+	payload, err := NewPayloadFromResponse(resp)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read remote state: %v", err)
 	}
 
 	return payload, nil

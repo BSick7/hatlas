@@ -35,13 +35,21 @@ func NewAtlasClient(config *AtlasConfig) *AtlasClient {
 }
 
 func (c *AtlasClient) get(path string, query map[string]string) (*Payload, error) {
+	return c.do("GET", path, query, nil)
+}
+
+func (c *AtlasClient) put(path string, query map[string]string, data *Payload) (*Payload, error) {
+	return c.do("PUT", path, query, data)
+}
+
+func (c *AtlasClient) do(verb string, path string, query map[string]string, data *Payload) (*Payload, error) {
 	u, err := c.config.Url(path, query)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create Atlas URL: %s", err)
+		return nil, fmt.Errorf("failed to create Atlas URL: %s", err)
 	}
-	req, err := retryablehttp.NewRequest("GET", u.String(), nil)
+	req, err := retryablehttp.NewRequest(verb, u.String(), c.createBody(data))
 	if err != nil {
-		return nil, fmt.Errorf("Failed to make HTTP request: %v", err)
+		return nil, fmt.Errorf("failed to make HTTP request: %v", err)
 	}
 
 	req.Header.Set(atlasTokenHeader, c.config.AccessToken)
@@ -107,6 +115,13 @@ func (c *AtlasClient) get(path string, query map[string]string) (*Payload, error
 	}
 
 	return payload, nil
+}
+
+func (c *AtlasClient) createBody(payload *Payload) io.ReadSeeker {
+	if payload == nil {
+		return nil
+	}
+	return payload.GetReader()
 }
 
 func (c *AtlasClient) readBody(b io.Reader) string {

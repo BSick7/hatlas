@@ -80,10 +80,10 @@ func (req *UpdateVariablesRequest) ToPayload() *Payload {
 	return NewPayloadFromString(string(raw))
 }
 
-func (c *AtlasClient) UpdateVariables(env string, vars *structs.TerraformRawConfig) ([]byte, error) {
+func (c *AtlasClient) UpdateVariables(env string, config *structs.TerraformRawConfig) ([]byte, error) {
 	path := fmt.Sprintf("/api/v1/environments/%s/variables", env)
 	req := &UpdateVariablesRequest{
-		Variables: vars.Version.TfVars.CreateMap(),
+		Variables: config.GetVarsMap(),
 	}
 	payload, err := c.put(path, nil, req.ToPayload())
 	if payload != nil {

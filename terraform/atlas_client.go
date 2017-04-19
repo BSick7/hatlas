@@ -36,8 +36,8 @@ func (c *AtlasClient) get(path string, query map[string]string) (*Payload, error
 	return c.do("GET", path, query, nil)
 }
 
-func (c *AtlasClient) put(path string, query map[string]string, data *Payload) (*Payload, error) {
-	return c.do("PUT", path, query, data)
+func (c *AtlasClient) put(path string, query map[string]string, payload *Payload) (*Payload, error) {
+	return c.do("PUT", path, query, payload)
 }
 
 func (c *AtlasClient) do(verb string, path string, query map[string]string, data *Payload) (*Payload, error) {
@@ -62,6 +62,10 @@ func (c *AtlasClient) do(verb string, path string, query map[string]string, data
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if os.Getenv("HTTP_DEBUG") != "" && data != nil {
+		log.Println(string(data.Data))
+	}
 
 	// Handle the common status codes
 	switch resp.StatusCode {

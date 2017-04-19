@@ -25,10 +25,10 @@ type TerraformRawConfigTfVar struct {
 
 type TerraformRawConfigTfVars []TerraformRawConfigTfVar
 
-func (vars TerraformRawConfigTfVars) CreateMap() map[string]interface{} {
+func (c *TerraformRawConfig) GetVarsMap() map[string]interface{} {
 	data := map[string]interface{}{}
-	for _, v := range vars {
-		data[v.Key] = data[v.Value]
+	for _, v := range c.Version.TfVars {
+		data[v.Key] = v.Value
 	}
 	return data
 }

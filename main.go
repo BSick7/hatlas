@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/BSick7/hatlas/command"
-	"github.com/mitchellh/cli"
 	"log"
 	"os"
+
+	"github.com/BSick7/hatlas/command"
+	"github.com/mitchellh/cli"
 )
 
 var Version string

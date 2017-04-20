@@ -19,6 +19,10 @@ type Payload struct {
 
 func NewPayloadFromString(str string) *Payload {
 	data := bytes.NewBufferString(str).Bytes()
+	return NewPayloadFromBytes(data)
+}
+
+func NewPayloadFromBytes(data []byte) *Payload {
 	hash := md5.Sum(data)
 	return &Payload{
 		Data: data,

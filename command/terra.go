@@ -20,11 +20,11 @@ func TerraCommandFactory(meta Meta) cli.CommandFactory {
 
 func (c *TerraCommand) Subcommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
-		"list":      TerraListFactory(c.Meta),
-		"state":     TerraStateFactory(c.Meta),
-		"outputs":   TerraOutputsFactory(c.Meta),
-		"config":    TerraConfigFactory(c.Meta),
-		"push-vars": TerraPushVarsFactory(c.Meta),
+		"list":    TerraListFactory(c.Meta),
+		"state":   TerraStateFactory(c.Meta),
+		"outputs": TerraOutputsFactory(c.Meta),
+		"config":  TerraConfigFactory(c.Meta),
+		"push":    TerraPushFactory(c.Meta),
 	}
 }
 
@@ -52,7 +52,7 @@ Available subcommands:
   state      Introspect state file
   outputs    Introspect outputs
   config     Introspect configuration
-  push-vars  Update variables
+  push       Update terraform environment
 `
 	return strings.TrimSpace(helpText)
 }

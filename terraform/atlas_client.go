@@ -106,7 +106,7 @@ func (c *AtlasClient) put(path string, query map[string]string, payload *Payload
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Failed to upload state: %v", err)
+		return fmt.Errorf("failed to PUT %s: %v", u.String(), err)
 	}
 	defer resp.Body.Close()
 

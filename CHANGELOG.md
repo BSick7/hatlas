@@ -1,3 +1,13 @@
+## 0.2.0 (Unreleased)
+
+FEATURES:
+
+  * Added `hatlas terra push` command with 2 subcommands: `vars` and `state`.
+
+INCOMPATIBILITIES:
+
+  * Replaced `push-vars` command with `push vars`.
+
 ## 0.1.4 (Apr 19, 2017)
 
 FEATURES:

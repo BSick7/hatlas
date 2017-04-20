@@ -93,3 +93,25 @@ func (c *AtlasClient) UpdateVariables(env string, config *structs.TerraformRawCo
 	}
 	return []byte(fmt.Sprintf("pushed %d variables to %s", len(req.Variables), env)), nil
 }
+
+type UpdateStateRequest struct {
+	State []byte
+}
+
+func (req *UpdateStateRequest) ToPayload() *Payload {
+	payload := NewPayloadFromBytes(req.State)
+	payload.ContentType = "application/json"
+	return payload
+}
+
+func (c *AtlasClient) UpdateState(env string, state []byte) ([]byte, error) {
+	path := fmt.Sprintf("/api/v1/terraform/state/%s", env)
+	req := &UpdateStateRequest{
+		State: state,
+	}
+
+	if err := c.put(path, nil, req.ToPayload()); err != nil {
+		return nil, err
+	}
+	return []byte(fmt.Sprintf("pushed state to %s", env)), nil
+}

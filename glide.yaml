@@ -4,3 +4,4 @@ import:
 - package: github.com/hashicorp/go-retryablehttp
 - package: github.com/hashicorp/go-rootcerts
 - package: github.com/mitchellh/cli
+- package: github.com/hashicorp/atlas-go

@@ -22,6 +22,7 @@ func (c *ArtifactsCommand) Subcommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
 		"list": ArtifactsListFactory(c.Meta),
 		"meta": ArtifactsMetaFactory(c.Meta),
+		"push": ArtifactsPushFactory(c.Meta),
 	}
 }
 
@@ -46,6 +47,8 @@ Usage: hatlas artifacts <subcommand>
 Available subcommands:
 
   list       List artifacts
+  meta       Dump artifact metadata
+  push       Push artifact metadata
 `
 	return strings.TrimSpace(helpText)
 }

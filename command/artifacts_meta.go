@@ -45,7 +45,7 @@ func (c *ArtifactsMetaCommand) Run(args []string) int {
 
 	client := atlas.DefaultClient()
 	if err := c.meta(client, username, name, artifactType); err != nil {
-		c.Ui.Error(fmt.Sprintf("error listing artifacts: %s", err))
+		c.Ui.Error(fmt.Sprintf("error grabbing artifact metadata: %s", err))
 		return 1
 	}
 	return 0

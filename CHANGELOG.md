@@ -1,4 +1,10 @@
-## 0.2.0 (Unreleased)
+## 0.2.1 (Unreleased)
+
+FEATURES:
+
+  * Added `hatlas artifacts list` command to list artifacts in atlas registry.
+
+## 0.2.0 (Apr 20, 2017)
 
 FEATURES:
 

@@ -3,12 +3,11 @@ package command
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"strings"
 
-	"github.com/eBay/fabio/admin/ui"
 	"github.com/hashicorp/atlas-go/v1"
 	"github.com/mitchellh/cli"
-	"io/ioutil"
 )
 
 type ArtifactsPushCommand struct {
@@ -98,7 +97,7 @@ func (c *ArtifactsPushCommand) getMeta(metafile string) ([]*atlas.ArtifactVersio
 	}
 
 	versions := []*atlas.ArtifactVersion{}
-	if err := json.Unmarshal(raw, versions); err != nil {
+	if err := json.Unmarshal(raw, &versions); err != nil {
 		return nil, fmt.Errorf("error reading artifact meta file %q: %s", metafile, err)
 	}
 

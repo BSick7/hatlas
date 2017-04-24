@@ -21,6 +21,7 @@ func ArtifactsCommandFactory(meta Meta) cli.CommandFactory {
 func (c *ArtifactsCommand) Subcommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
 		"list": ArtifactsListFactory(c.Meta),
+		"meta": ArtifactsMetaFactory(c.Meta),
 	}
 }
 

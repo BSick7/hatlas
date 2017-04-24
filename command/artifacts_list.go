@@ -74,7 +74,7 @@ func (c *ArtifactsListCommand) Run(args []string) int {
 }
 
 func (c *ArtifactsListCommand) Synopsis() string {
-	return "List terraform environments in atlas"
+	return "List all artifacts for build"
 }
 
 func (c *ArtifactsListCommand) Help() string {

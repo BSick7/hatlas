@@ -23,7 +23,8 @@ func main() {
 	meta := *metaPtr
 
 	c.Commands = map[string]cli.CommandFactory{
-		"terra": command.TerraCommandFactory(meta),
+		"artifacts": command.ArtifactsCommandFactory(meta),
+		"terra":     command.TerraCommandFactory(meta),
 	}
 
 	exitStatus, err := c.Run()

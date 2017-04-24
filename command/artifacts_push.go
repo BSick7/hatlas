@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -120,7 +121,7 @@ func (c *ArtifactsPushCommand) ensureArtifact(client *atlas.Client, username str
 
 func (c *ArtifactsPushCommand) pushSingleArtifact(client *atlas.Client, version *atlas.ArtifactVersion) error {
 	if version.File {
-		return fmt.Errorf("hatlas does not support pushing artifacts that contain files")
+		return errors.New("hatlas does not support pushing artifacts that contain files")
 	}
 
 	_, err := client.UploadArtifact(&atlas.UploadArtifactOpts{
